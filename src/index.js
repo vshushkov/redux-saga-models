@@ -2,6 +2,7 @@
  * @todo write tests
  */
 
+import { combineReducers as origCombineReducers } from 'redux';
 import { normalizeMixinsMethods, normalizeMethods } from './methods';
 import { createActions } from './actions';
 import { createReducer } from './reducer';
@@ -14,7 +15,7 @@ import { createSagas } from './sagas';
 class Model {
 
   constructor(modelConfig) {
-    const { mixins, combineReducers } = modelConfig;
+    const { mixins, combineReducers = origCombineReducers } = modelConfig;
     this._config = modelConfig;
 
     const methods = normalizeMethods(this._config.methods || {});
@@ -63,7 +64,7 @@ export function createModel(config) {
  * @return {{models: *, reducer: *, sagas: *}}
  */
 export function createModels({
-  models, mixins = [], fetch = null, combineReducers = null,
+  models, mixins = [], fetch = null, combineReducers = origCombineReducers,
   stateToModels = (state) => state.models }
 ) {
   const impls = models

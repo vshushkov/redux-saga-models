@@ -90,7 +90,6 @@ describe('Index', () => {
 
     const model = createModel({
       name: 'auth',
-      combineReducers,
       methods: api({
         fetch,
         methods: {
@@ -134,8 +133,7 @@ describe('Index', () => {
         { name: 'model4' }
       ],
       mixins: [crud({ fetch: () => {} })],
-      fetch: () => {},
-      combineReducers
+      fetch: () => {}
     });
 
     expect(models).to.have.property('actions');
