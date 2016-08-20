@@ -75,15 +75,32 @@ export function createModels({
     }))
     .map(modelConfig => new Model(modelConfig));
 
-  const actions = impls.reduce((actions, model) => ({ ...actions, [model.config().name]: model.actions }), {});
+  const modelsObject = impls.reduce((models, model) => ({
+    ...models,
+    [model.config().name]: {
+      ...model.actions,
+      selectors: model.selectors,
+      sagas: model.sagas,
+      reducer: model.reducer,
+      model
+    }
+  }), {});
+
+  const actions = impls.reduce((actions, model) => ({
+    ...actions,
+    [model.config().name]: model.actions
+  }), {});
+
   const sagas = impls.reduce((sagas, model) => ([...sagas, ...model.sagas]), []);
-  const reducer = combineReducers(
-    impls.reduce((reducers, model) => ({ ...reducers, [model.config().name]: model.reducer }), {})
-  );
+
+  const reducer = combineReducers(impls.reduce((reducers, model) => ({
+    ...reducers,
+    [model.config().name]: model.reducer
+  }), {}));
 
   const setStore = (store) => {
     impls.forEach((model) => model.setStore(store, stateToModels))
   };
 
-  return { actions, sagas, reducer, setStore };
+  return { models: modelsObject, actions, sagas, reducer, setStore };
 }
