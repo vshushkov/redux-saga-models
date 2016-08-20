@@ -100,9 +100,11 @@ describe('Index', () => {
           }
         }
       }),
-      reducer: ({ FETCH_TOKEN_SUCCESS }) => (state = {}, action) => ({
-        accessToken: action.result ? action.result.access_token : null
-      }),
+
+      reducer: ({ FETCH_TOKEN_SUCCESS }) =>
+        (state = { accessToken: null }, action) =>
+          action.type === FETCH_TOKEN_SUCCESS ? { accessToken: action.result.access_token } : state,
+
       selectors: {
         token: function() {
           return this.getModelState().model.accessToken

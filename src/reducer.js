@@ -2,6 +2,7 @@ import isEqual from 'lodash/isEqual';
 import isFunction from 'lodash/isFunction';
 import isString from 'lodash/isString';
 import flatten from 'lodash/flatten';
+import snakeCase from 'lodash/snakeCase';
 import { methodNameToTypes } from './actions';
 import { normalizeMethods, normalizeMixinsMethods } from './methods';
 
@@ -75,10 +76,16 @@ export function defaultReducer(model) {
  */
 export function createReducer(model, mixins, combineReducers) {
   const types = normalizeMethods(model.config().methods || {})
-    .map(method => methodNameToTypes(model.config().name, method.name));
+    .reduce((types, method) => {
+      const methodTypes = methodNameToTypes(model.config().name, method.name);
+      types[snakeCase(method.name).toUpperCase()] = methodTypes[0];
+      types[snakeCase(`${method.name}Success`).toUpperCase()] = methodTypes[1];
+      types[snakeCase(`${method.name}Error`).toUpperCase()] = methodTypes[2];
+      return types;
+    }, {});
 
   const modelReducer = isFunction(model.config().reducer) ?
-    model.config().reducer(flatten(types)) : defaultReducer(model);
+    model.config().reducer(types) : defaultReducer(model);
 
   const mixinsReducers = (mixins || [])
     .filter(mixin => isFunction(mixin.createReducer))
