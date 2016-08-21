@@ -9,15 +9,17 @@ import { methodNameToTypes } from './actions';
  * @return {Function}
  */
 export const createMethod = (method) => {
-  return function* createdSagaApiMethod({ params, types: { success, failure }, callbacks: { resolve, reject } }) {
+  return function* createdSagaApiMethod({ meta }) {
+    const { params, types: { success, failure }, callbacks: { resolve, reject } } = meta;
+
     try {
-      const result = yield call(method, params);
-      yield put({ type: success, result, params });
+      const result = yield call(method, ...params);
+      yield put({ type: success, payload: result, meta: { params } });
       if (typeof resolve === 'function') {
         resolve(result);
       }
     } catch (error) {
-      yield put({ type: failure, params, error });
+      yield put({ type: failure, payload: error, error: true, meta: { params } });
       if (typeof resolve === 'function') {
         reject(error);
       }
@@ -33,6 +35,7 @@ export const createMethod = (method) => {
  */
 export function createSagas(model, methods) {
   return methods
+    .filter(method => typeof method === 'function')
     .map(method => {
       const [type] = methodNameToTypes(model.config().name, method.name);
       return function* () {

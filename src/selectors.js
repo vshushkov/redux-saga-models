@@ -6,38 +6,41 @@ import { normalizeMethods } from './methods';
 /**
  *
  * @param {Model} model
- * @param {Array} methods
+ * @param {Function} method
+ * @param {Boolean} returnAsIs
  * @return {Object}
  */
-function defaultSelectors(model, methods) {
-  return normalizeMethods(methods)
-    .reduce((selectors, method) => ({
-      ...selectors,
-      [method.name || method]: function(params) {
-        const state = this.getModelState().model;
-        const result = (state[method.name || method] || [])
-          .find(row => isEqual(params, row.params));
+function defaultMethodSelector(model, method, returnAsIs) {
+  const methodName = method.name;
+  return function(...params) {
+    const state = this.getModelState()[methodName];
+    if (returnAsIs) {
+      return state;
+    }
 
-        if (!result) {
-          return method.name ? { result: null, fetching: true, fetched: false } : null;
-        }
-
-        return method.name ? result : result.result;
-      }.bind(model)
-    }), {});
+    const result = (state || []).find(row => isEqual(params, row.params));
+    return result || { result: null, fetching: true, fetched: false };
+  }.bind(model);
 }
 
 function createModelSelectors(model) {
-  if (isEmpty(model.config().selectors)) {
-    return defaultSelectors(model, model.config().methods || {});
-  }
+  const defaultSelectors = (model.methods || [])
+    .reduce((selectors, method) => ({
+      ...selectors,
+      [method.name]: defaultMethodSelector(model, method, model.isReducerAsOverridden(method.name))
+    }), {});
 
-  return Object.keys(model.config().selectors || {})
+  const customSelectors = Object.keys(model.config().selectors || {})
     .filter(selectorName => isFunction(model.config().selectors[selectorName]))
     .reduce((selectors, selectorName) => ({
       ...selectors,
       [selectorName]: model.config().selectors[selectorName].bind(model)
     }), {});
+
+  return {
+    ...defaultSelectors,
+    ...customSelectors
+  };
 }
 
 /**

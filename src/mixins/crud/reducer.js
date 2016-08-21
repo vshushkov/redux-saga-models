@@ -79,18 +79,19 @@ function createModelReducer({ types }) {
    */
 
   function byIdReducer(state = byIdInitialState, action) {
-    const id = (action.params && action.params.id ? action.params.id :
-        (action.result && action.result.id ? action.result.id : '')
+    const id = (action.meta.params && action.meta.params[0] && action.meta.params[0].id ? action.meta.params[0].id :
+        (action.payload && action.payload.id ? action.payload.id : '')
     ).toString();
-    const fetchTime = action.fetchTime;
-    const response = action.result;
-    const error = action.error || null;
+
+    const fetchTime = action.meta.fetchTime;
+    const response = !action.error ? action.payload : null;
+    const error = action.error ? action.payload : null;
 
     switch (action.type) {
       case FIND_SUCCESS:
         return {
           ...state,
-          ...(action.result.reduce((records, record) => {
+          ...(action.payload.reduce((records, record) => {
             records[record.id] = {
               ...byIdDocumentInitialState,
               record,
@@ -155,10 +156,10 @@ function createModelReducer({ types }) {
    * Note: fetchTime of null means "needs fetch"
    */
   function collectionReducer(state = collectionInitialState, action) {
-    const fetchTime = action.fetchTime;
-    const params = action.params || {};
-    const response = action.result;
-    const error = action.error || null;
+    const fetchTime = action.meta.fetchTime;
+    const params = action.meta.params || {};
+    const response = !action.error ? action.payload : null;
+    const error = action.error ? action.payload : null;
 
     switch (action.type) {
       case FIND:
@@ -196,7 +197,7 @@ function createModelReducer({ types }) {
   }
 
   function collectionsReducer(state = collectionsInitialState, action) {
-    const params = action.params || {};
+    const params = action.meta.params || {};
 
     switch (action.type) {
 

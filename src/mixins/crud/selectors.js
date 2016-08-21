@@ -34,7 +34,7 @@ export default function createSelectors(model) {
     return _findById(mixinSate, { id });
   }
 
-  function find(params = {}) {
+  function find(...params) {
     const mixinSate = this.getModelState()[mixinName];
     return _find(mixinSate, params);
   }

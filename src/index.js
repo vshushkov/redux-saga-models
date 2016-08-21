@@ -1,7 +1,3 @@
-/**
- * @todo write tests
- */
-
 import { combineReducers as origCombineReducers } from 'redux';
 import { normalizeMixinsMethods, normalizeMethods } from './methods';
 import { createActions } from './actions';
@@ -17,18 +13,27 @@ class Model {
   constructor(modelConfig) {
     const { mixins, combineReducers = origCombineReducers } = modelConfig;
     this._config = modelConfig;
+    this._overriddenReducers = [];
 
-    const methods = normalizeMethods(this._config.methods || {});
-    const mixinsMethods = normalizeMixinsMethods(this, mixins);
+    this.methods = normalizeMethods(this._config.methods || {});
+    this.mixinsMethods = normalizeMixinsMethods(this, mixins);
 
     this.reducer = createReducer(this, mixins, combineReducers);
-    this.actions = createActions(this, [...methods, ...mixinsMethods]);
-    this.sagas = createSagas(this, [...methods, ...mixinsMethods]);
+    this.actions = createActions(this, [...this.methods, ...this.mixinsMethods]);
+    this.sagas = createSagas(this, [...this.methods, ...this.mixinsMethods]);
     this.selectors = createSelectors(this, this._config.mixins);
   }
 
   config() {
     return this._config;
+  }
+
+  _markReducerAsOverridden(reducerName) {
+    this._overriddenReducers.push(reducerName);
+  }
+
+  isReducerAsOverridden(reducerName) {
+    return this._overriddenReducers.includes(reducerName);
   }
 
   setStore(store, stateToModels = (state) => state) {

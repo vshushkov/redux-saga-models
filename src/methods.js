@@ -2,14 +2,13 @@ import isArray from 'lodash/isArray';
 import isString from 'lodash/isString';
 import isFunction from 'lodash/isFunction';
 
-
 /**
  *
  * @param {*} methods
  * @return {Array}
  */
 export function normalizeMethods(methods) {
-  const filter = method => isFunction(method);
+  const filter = method => (isFunction(method) && method.name) || isString(method);
 
   if (isArray(methods)) {
     return methods.filter(filter);
