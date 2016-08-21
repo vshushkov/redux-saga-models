@@ -1,6 +1,6 @@
 import snakeCase from 'lodash/snakeCase';
 
-const typePrefix = '@@models/';
+const typePrefix = '@@redux-saga-models/';
 
 export function methodNameToTypes(modelName, methodName) {
   const type = `${typePrefix}${snakeCase(modelName).toUpperCase()}/${snakeCase(methodName).toUpperCase()}`;
