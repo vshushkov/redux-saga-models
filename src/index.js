@@ -38,6 +38,16 @@ class Model {
   }
 }
 
+function _createModel(model) {
+  return {
+    ...model.actions,
+    selectors: model.selectors,
+    sagas: model.sagas,
+    reducer: model.reducer,
+    model
+  };
+}
+
 
 /**
  * @param {Object} config
@@ -46,13 +56,7 @@ class Model {
  */
 export function createModel(config) {
   const model = new Model(config);
-  return {
-    ...model.actions,
-    selectors: model.selectors,
-    sagas: model.sagas,
-    reducer: model.reducer,
-    model
-  };
+  return _createModel(model);
 }
 
 /**
@@ -68,35 +72,27 @@ export function createModels({
   stateToModels = (state) => state.models }
 ) {
   const impls = models
-    .map(modelConfig => ({
+    .map(modelConfig => new Model({
       ...modelConfig,
       fetch: fetch || modelConfig.fetch,
       combineReducers: combineReducers || modelConfig.combineReducers,
       mixins: [...mixins, ...(modelConfig.mixins || [])]
-    }))
-    .map(modelConfig => new Model(modelConfig));
+    }));
 
   const modelsObject = impls.reduce((models, model) => ({
-    ...models,
-    [model.config().name]: {
-      ...model.actions,
-      selectors: model.selectors,
-      sagas: model.sagas,
-      reducer: model.reducer,
-      model
-    }
+    ...models, [model.config().name]: _createModel(model)
   }), {});
 
   const actions = impls.reduce((actions, model) => ({
-    ...actions,
-    [model.config().name]: model.actions
+    ...actions, [model.config().name]: model.actions
   }), {});
 
-  const sagas = impls.reduce((sagas, model) => ([...sagas, ...model.sagas]), []);
+  const sagas = impls.reduce((sagas, model) => ([
+    ...sagas, ...model.sagas
+  ]), []);
 
   const reducer = combineReducers(impls.reduce((reducers, model) => ({
-    ...reducers,
-    [model.config().name]: model.reducer
+    ...reducers, [model.config().name]: model.reducer
   }), {}));
 
   const setStore = (store) => {
