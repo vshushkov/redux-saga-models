@@ -80,15 +80,15 @@ Also you can define custom reducer and selectors:
 ```js
 const user = createModel({
   ...
-  // LOGIN_SUCCESS -- based on name of `login` function 
-  reducer: ({ LOGIN_SUCCESS }) => 
-    (state = { token: null }, action) => 
-      action.type === LOGIN_SUCCESS ? { token: action.result.token } : state,
-  
+  reducers: {
+    login: (state, action) => {
+      return !action.error && action.payload ? action.payload.token : null;
+    }
+  },
+
   selectors: {
     token() {
-      const state = this.getModelState().model;
-      return state.token;
+      return this.getModelState().login;
     }
   }
   ...
@@ -100,6 +100,8 @@ See more examples and configuration ways in tests.
 ## Roadmap
 
 * Make a simpler interface for creating models
+* Add example projects
+* Use isomorphic-fetch as default fetch in `helpers/api` and `mixins/crud`
 * 100% tests code coverage
 * ...
 
