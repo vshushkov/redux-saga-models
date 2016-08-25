@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual';
 import isEmpty from 'lodash/isEmpty';
 import { name as mixinName } from './index';
 
-function _findById(modelSate, { id }) {
+export function _findById(modelSate, { id }) {
   if (!modelSate || isEmpty(modelSate.byId)) {
     return { requesting: true, record: {} };
   }
@@ -10,7 +10,7 @@ function _findById(modelSate, { id }) {
   return modelSate.byId[id] || { requesting: true, record: {} };
 }
 
-function _find(modelSate, params = {}) {
+export function _find(modelSate, params = {}) {
   if (!modelSate) {
     return { requesting: true, records: [] };
   }

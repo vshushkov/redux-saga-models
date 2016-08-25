@@ -79,9 +79,12 @@ function createModelReducer({ types }) {
    */
 
   function byIdReducer(state = byIdInitialState, action) {
-    const id = (action.meta.params && action.meta.params[0] && action.meta.params[0].id ? action.meta.params[0].id :
-        (action.payload && action.payload.id ? action.payload.id : '')
-    ).toString();
+    let id = null;
+    if (action.meta.params && action.meta.params[0] && action.meta.params[0].id) {
+      id = action.meta.params[0].id;
+    } else if (action.payload && action.payload.id) {
+      id = action.payload.id;
+    }
 
     const fetchTime = action.meta.fetchTime;
     const response = !action.error ? action.payload : null;
