@@ -107,10 +107,14 @@ export function createReducer(model, mixins, combineReducers) {
 
   const mixinsReducers = (mixins || [])
     .filter(mixin => isFunction(mixin.createReducer))
-    .reduce((reducers, mixin) => ({
-      ...reducers,
-      [mixin.name]: mixin.createReducer(model, combineReducers)
-    }), {});
+    .reduce((reducers, mixin) => {
+      const reducer = mixin.createReducer(model, combineReducers);
+      if (!reducer) {
+        return reducers;
+      }
+
+      return { ...reducers, [mixin.name]: reducer };
+    }, {});
 
   return combineReducers({
     ...methodsReducers,

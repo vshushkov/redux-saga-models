@@ -214,9 +214,8 @@ describe('Index', () => {
         expect(user.selectors.login(username, password)).to.equal(response.token);
         expect(user.selectors.login('blabla')).to.equal(response.token);
         expect(user.selectors.token()).to.equal(response.token);
-
-        //done();
       })
+
       .then(() => user.findById('user-id'))
       .then((response) => {
         expect(response).to.deep.equal(findByIdResponse('user-id'));
@@ -226,6 +225,93 @@ describe('Index', () => {
         expect(result.fetching).to.be.not.ok;
         expect(result.fetched).to.be.ok;
       })
+
+      .then(() => user.findById('another-user-id'))
+      .then((response) => {
+        expect(response).to.deep.equal(findByIdResponse('another-user-id'));
+
+        const result1 = user.selectors.findById('another-user-id');
+        expect(result1.result).to.deep.equal(findByIdResponse('another-user-id'));
+        expect(result1.fetching).to.be.not.ok;
+        expect(result1.fetched).to.be.ok;
+
+        const result2 = user.selectors.findById('user-id');
+        expect(result2.result).to.deep.equal(findByIdResponse('user-id'));
+        expect(result2.fetching).to.be.not.ok;
+        expect(result2.fetched).to.be.ok;
+      })
+      .then(() => done())
+      .catch(done);
+  });
+
+  it('create model with custom reducer/selectors #4', (done) => {
+
+    const username = 'username';
+    const password = 'password';
+
+    const findByIdResponse = (id) => ({ id, email: `${id}@email.com` });
+    const loginResponse = (username, password) => ({ token: username + '-' + password });
+
+    const user = createModel({
+      name: 'user',
+      methods: {
+        login(username, password) {
+          return Promise.resolve(loginResponse(username, password));
+        },
+        findById(id) {
+          return findByIdResponse(id);
+        }
+      },
+
+      reducers: ({ LOGIN_SUCCESS }) => ({
+        login: (state, action) => {
+          if (LOGIN_SUCCESS) {
+            return action.payload && action.payload.token ? action.payload.token : null
+          }
+
+          return state;
+        }
+      }),
+
+      selectors: {
+        token() {
+          return this.getModelState().login;
+        }
+      }
+    });
+
+    createSagaStore(user.model);
+
+    const result1 = user.selectors.login(username, password);
+    expect(result1).to.deep.equal(null);
+
+    const result2 = user.selectors.login('bla-bla');
+    expect(result2).to.deep.equal(null);
+
+    const result3 = user.selectors.findById('user-id');
+    expect(result3.result).to.deep.equal(null);
+    expect(result3.fetching).to.be.ok;
+    expect(result3.fetched).to.be.not.ok;
+
+    user.login(username, password)
+      .then((response) => {
+        expect(response).to.deep.equal(loginResponse(username, password));
+
+        expect(user.selectors.login(username, password)).to.equal(response.token);
+        expect(user.selectors.login('blabla')).to.equal(response.token);
+        expect(user.selectors.token()).to.equal(response.token);
+      })
+
+      .then(() => user.findById('user-id'))
+      .then((response) => {
+        expect(response).to.deep.equal(findByIdResponse('user-id'));
+
+        const result = user.selectors.findById('user-id');
+        expect(result.result).to.deep.equal(findByIdResponse('user-id'));
+        expect(result.fetching).to.be.not.ok;
+        expect(result.fetched).to.be.ok;
+      })
+
       .then(() => user.findById('another-user-id'))
       .then((response) => {
         expect(response).to.deep.equal(findByIdResponse('another-user-id'));
