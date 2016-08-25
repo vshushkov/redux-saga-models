@@ -100,6 +100,7 @@ See more examples and configuration ways in tests.
 ## Roadmap
 
 * Make a simpler interface for creating models
+* Write README
 * Add example projects
 * Use isomorphic-fetch as default fetch in `helpers/api` and `mixins/crud`
 * 100% tests code coverage
