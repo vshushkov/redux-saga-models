@@ -22,8 +22,9 @@ export function _find(modelSate, params = {}) {
     return { requesting: true, records: [] };
   }
 
-  const records = entry.ids.map(id => modelSate.byId[id]);
-
+  const records = entry.ids
+    .map(id => modelSate.byId[id])
+    .filter(record => record);
 
   return { ... entry, records };
 }

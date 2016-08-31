@@ -269,7 +269,7 @@ function createModelReducer({ types }) {
         return {
           ...state,
           byId: byIdReducer(state.byId, action),
-          collections: byIdReducer(state.collections, action)
+          collections: collectionsReducer(state.collections, action)
         };
 
       default:

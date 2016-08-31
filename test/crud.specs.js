@@ -6,7 +6,7 @@ import api from '../src/helpers/api';
 import crud from '../src/mixins/crud';
 import { createSagaStore } from './utils';
 
-const users = [
+let users = [
   { id: 'user1', email: 'email1@email.com' },
   { id: 'user2', email: 'email2@email.com' },
   { id: 'user3', email: 'email3@email.com' },
@@ -41,8 +41,19 @@ const fetch = (path, options) => {
       return Promise.reject({ error: 'not found' });
     }
 
-    if (options.method === 'get' || options.method === 'delete') {
+    if (options.method === 'get') {
       return Promise.resolve(users[index]);
+    }
+
+    if (options.method === 'delete') {
+      const user = users[index];
+
+      users = [
+        ...users.slice(0, index),
+        ...users.slice(index + 1, users.length)
+      ];
+
+      return Promise.resolve(user);
     }
 
     if (options.method === 'put') {
@@ -80,7 +91,7 @@ describe('CRUD mixin', () => {
       })
     });
 
-    createSagaStore(model.model);
+    const store = createSagaStore(model.model);
 
     expect(model.create).to.be.a('function');
     expect(model.updateById).to.be.a('function');
@@ -109,76 +120,116 @@ describe('CRUD mixin', () => {
     expect(logoutResult.result).to.be.not.ok;
     expect(logoutResult.fetching).to.be.ok;
 
-    model.findById({ id: 'user1' })
+    Promise.resolve()
       .then(() => {
-        const findByIdResult = model.selectors.findById({ id: 'user1' });
-        expect(findByIdResult.record).to.deep.equal(users[0]);
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
 
-        return model.find(query1);
+        model.findById({ id: 'user1' })
+          .then(() => {
+            const findByIdResult = model.selectors.findById({ id: 'user1' });
+            expect(findByIdResult.record).to.deep.equal(users[0]);
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findResult = model.selectors.find(query1);
-        expect(findResult.records.map(row => row.record)).to.deep.equal([users[1]]);
-        expect(findResult.requested).to.be.ok;
-        expect(findResult.requesting).to.be.not.ok;
 
-        const findByIdResult = model.selectors.findById({ id: 'user2' });
-        expect(findByIdResult.record).to.deep.equal(users[1]);
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
+        return model.find(query1)
+          .then(() => {
+            const findResult = model.selectors.find(query1);
+            expect(findResult.records.map(row => row.record)).to.deep.equal([users[1]]);
+            expect(findResult.requested).to.be.ok;
+            expect(findResult.requesting).to.be.not.ok;
 
-        return model.find(query2);
+            const findByIdResult = model.selectors.findById({ id: 'user2' });
+            expect(findByIdResult.record).to.deep.equal(users[1]);
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findResult = model.selectors.find(query2);
-        expect(findResult.records.map(row => row.record)).to.deep.equal([users[2]]);
-        expect(findResult.requested).to.be.ok;
-        expect(findResult.requesting).to.be.not.ok;
 
-        const findByIdResult = model.selectors.findById({ id: 'user3' });
-        expect(findByIdResult.record).to.deep.equal(users[2]);
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
+        return model.find(query2)
+          .then(() => {
+            const findResult = model.selectors.find(query2);
+            expect(findResult.records.map(row => row.record)).to.deep.equal([users[2]]);
+            expect(findResult.requested).to.be.ok;
+            expect(findResult.requesting).to.be.not.ok;
 
-        return model.find();
+            const findByIdResult = model.selectors.findById({ id: 'user3' });
+            expect(findByIdResult.record).to.deep.equal(users[2]);
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findResult = model.selectors.find();
-        expect(findResult.records.map(row => row.record)).to.deep.equal(users);
-        expect(findResult.requested).to.be.ok;
-        expect(findResult.requesting).to.be.not.ok;
 
-        const findByIdResult = model.selectors.findById({ id: 'user4' });
-        expect(findByIdResult.record).to.deep.equal(users[3]);
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
+        return model.find()
+          .then(() => {
+            const findResult = model.selectors.find();
+            expect(findResult.records.map(row => row.record)).to.deep.equal(users);
+            expect(findResult.requested).to.be.ok;
+            expect(findResult.requesting).to.be.not.ok;
 
-        return model.updateById({ id: 'user1', email: 'new@email.com' });
+            const findByIdResult = model.selectors.findById({ id: 'user4' });
+            expect(findByIdResult.record).to.deep.equal(users[3]);
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findByIdResult = model.selectors.findById({ id: 'user1' });
-        expect(findByIdResult.record).to.deep.equal(users[0]);
-        expect(findByIdResult.record.email).to.equal('new@email.com');
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
 
-        return model.create({ email: 'blabla@email.com' });
+        return model.updateById({ id: 'user1', email: 'new@email.com' })
+          .then(() => {
+            const findByIdResult = model.selectors.findById({ id: 'user1' });
+            expect(findByIdResult.record).to.deep.equal(users[0]);
+            expect(findByIdResult.record.email).to.equal('new@email.com');
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findByIdResult = model.selectors.findById({ id: 'user5' });
-        expect(findByIdResult.record).to.deep.equal(users[4]);
-        expect(findByIdResult.record.email).to.equal('blabla@email.com');
-        expect(findByIdResult.requested).to.be.ok;
-        expect(findByIdResult.requesting).to.be.not.ok;
 
-        return model.deleteById({ id: 'user2' });
+        return model.create({ email: 'blabla@email.com' })
+          .then(() => {
+            const findByIdResult = model.selectors.findById({ id: 'user5' });
+            expect(findByIdResult.record).to.deep.equal(users[4]);
+            expect(findByIdResult.record.email).to.equal('blabla@email.com');
+            expect(findByIdResult.requested).to.be.ok;
+            expect(findByIdResult.requesting).to.be.not.ok;
+          });
+
       })
       .then(() => {
-        const findByIdResult = model.selectors.findById({ id: 'user2' });
-        expect(findByIdResult.record).to.deep.equal({});
-        expect(findByIdResult.requesting).to.be.ok;
+
+        return model.deleteById({ id: 'user2' })
+          .then(() => {
+            const findByIdResult = model.selectors.findById({ id: 'user2' });
+            expect(findByIdResult.record).to.deep.equal({});
+            expect(findByIdResult.requesting).to.be.ok;
+          });
+
+      })
+      .then(() => {
+
+        return model.find(query3)
+          .then(() => {
+            const findResult = model.selectors.find(query3);
+            console.log('findResult', findResult);
+            expect(findResult.params).to.deep.equal([query3]);
+            expect(findResult.ids).to.deep.equal(['user5', 'user4', 'user3', 'user1']);
+            expect(findResult.records.map(row => row.record)).to.deep.equal(users);
+            expect(findResult.error).to.be.not.ok;
+            expect(findResult.requesting).to.be.not.ok;
+            expect(findResult.requested).to.be.ok;
+          });
+
+      })
+      .then(() => {
 
         return model.findById({ id: 'user8' })
           .catch(() => {
@@ -188,6 +239,7 @@ describe('CRUD mixin', () => {
             expect(findByIdResult.requesting).to.be.not.ok;
             expect(findByIdResult.requested).to.be.not.ok;
           });
+
       })
       .then(() => done())
       .catch(done);

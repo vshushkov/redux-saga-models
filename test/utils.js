@@ -16,4 +16,6 @@ export function createSagaStore(model) {
   store.close = () => store.dispatch(END);
 
   model.setStore(store);
+
+  return store;
 }
