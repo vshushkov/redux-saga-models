@@ -2,7 +2,7 @@
 
 Models layer backed with [redux-saga](https://www.npmjs.com/package/redux-saga). 
 
-Library is **NOT** ready for production  yet.
+Library is **NOT** ready for production yet.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Library is **NOT** ready for production  yet.
     
 ## Features
 
-* Sagas to handle async operations
+* Sagas to handle dispatched actions
 * Mixins (see example of mixin in `mininx/crud` and `test/crud.specs.js`)
 * Grouping models (see `test/index.specs.js` -- `create models`)
 * Dispatch actions from any place of application (thanks to [machadogj](https://github.com/machadogj) for idea)
@@ -100,6 +100,7 @@ See more examples and configuration ways in tests.
 ## Roadmap
 
 * Make a simpler interface for creating models
+* Write README
 * Add example projects
 * Use isomorphic-fetch as default fetch in `helpers/api` and `mixins/crud`
 * 100% tests code coverage
