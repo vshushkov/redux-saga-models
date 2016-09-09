@@ -219,7 +219,6 @@ describe('CRUD mixin', () => {
         return model.find(query3)
           .then(() => {
             const findResult = model.selectors.find(query3);
-            console.log('findResult', findResult);
             expect(findResult.params).to.deep.equal([query3]);
             expect(findResult.ids).to.deep.equal(['user5', 'user4', 'user3', 'user1']);
             expect(findResult.records.map(row => row.record)).to.deep.equal(users);
