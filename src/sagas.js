@@ -19,6 +19,10 @@ export const createMethod = (method) => {
         resolve(result);
       }
     } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+
       yield put({ type: failure, payload: error, error: true, meta: { params } });
       if (typeof resolve === 'function') {
         reject(error);
