@@ -19,7 +19,7 @@ function defaultMethodSelector(model, method, returnAsIs) {
     }
 
     const result = (state || []).find(row => isEqual(params, row.params));
-    return result || { result: null, fetching: true, fetched: false };
+    return result || { result: null, requesting: true, requested: false };
   }.bind(model);
 }
 

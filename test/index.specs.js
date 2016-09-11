@@ -45,28 +45,28 @@ describe('Index', () => {
 
     const findByIdResult = model.selectors.findById(query);
     expect(findByIdResult.result).to.be.not.ok;
-    expect(findByIdResult.fetching).to.be.ok;
-    expect(findByIdResult.fetched).to.be.not.ok;
+    expect(findByIdResult.requesting).to.be.ok;
+    expect(findByIdResult.requested).to.be.not.ok;
 
     const methodResult = model.selectors.method(query);
     expect(methodResult.result).to.be.not.ok;
-    expect(methodResult.fetching).to.be.ok;
-    expect(methodResult.fetched).to.be.not.ok;
+    expect(methodResult.requesting).to.be.ok;
+    expect(methodResult.requested).to.be.not.ok;
 
     model.findById(query)
       .then(() => {
         const findByIdResult = model.selectors.findById(query);
         expect(findByIdResult.result).to.deep.equal(user);
-        expect(findByIdResult.fetching).to.be.not.ok;
-        expect(findByIdResult.fetched).to.be.ok;
+        expect(findByIdResult.requesting).to.be.not.ok;
+        expect(findByIdResult.requested).to.be.ok;
 
         return model.method({ key: 'value' });
       })
       .then(() => {
         const result = model.selectors.method({ key: 'value' });
         expect(result.result).to.deep.equal({ key: 'value', success: 'ok' });
-        expect(result.fetching).to.be.not.ok;
-        expect(result.fetched).to.be.ok;
+        expect(result.requesting).to.be.not.ok;
+        expect(result.requested).to.be.ok;
       })
       .then(() => done())
       .catch(done);
@@ -151,8 +151,8 @@ describe('Index', () => {
         const result = user.selectors.login(username, password);
 
         expect(result.result).to.deep.equal({ token, username, password });
-        expect(result.fetching).to.be.not.ok;
-        expect(result.fetched).to.be.ok;
+        expect(result.requesting).to.be.not.ok;
+        expect(result.requested).to.be.ok;
 
         expect(user.selectors.token()).to.deep.equal({ token, username, password });
 
@@ -204,8 +204,8 @@ describe('Index', () => {
 
     const result3 = user.selectors.findById('user-id');
     expect(result3.result).to.deep.equal(null);
-    expect(result3.fetching).to.be.ok;
-    expect(result3.fetched).to.be.not.ok;
+    expect(result3.requesting).to.be.ok;
+    expect(result3.requested).to.be.not.ok;
 
     user.login(username, password)
       .then((response) => {
@@ -222,8 +222,8 @@ describe('Index', () => {
 
         const result = user.selectors.findById('user-id');
         expect(result.result).to.deep.equal(findByIdResponse('user-id'));
-        expect(result.fetching).to.be.not.ok;
-        expect(result.fetched).to.be.ok;
+        expect(result.requesting).to.be.not.ok;
+        expect(result.requested).to.be.ok;
       })
 
       .then(() => user.findById('another-user-id'))
@@ -232,13 +232,13 @@ describe('Index', () => {
 
         const result1 = user.selectors.findById('another-user-id');
         expect(result1.result).to.deep.equal(findByIdResponse('another-user-id'));
-        expect(result1.fetching).to.be.not.ok;
-        expect(result1.fetched).to.be.ok;
+        expect(result1.requesting).to.be.not.ok;
+        expect(result1.requested).to.be.ok;
 
         const result2 = user.selectors.findById('user-id');
         expect(result2.result).to.deep.equal(findByIdResponse('user-id'));
-        expect(result2.fetching).to.be.not.ok;
-        expect(result2.fetched).to.be.ok;
+        expect(result2.requesting).to.be.not.ok;
+        expect(result2.requested).to.be.ok;
       })
       .then(() => done())
       .catch(done);
@@ -290,8 +290,8 @@ describe('Index', () => {
 
     const result3 = user.selectors.findById('user-id');
     expect(result3.result).to.deep.equal(null);
-    expect(result3.fetching).to.be.ok;
-    expect(result3.fetched).to.be.not.ok;
+    expect(result3.requesting).to.be.ok;
+    expect(result3.requested).to.be.not.ok;
 
     user.login(username, password)
       .then((response) => {
@@ -308,8 +308,8 @@ describe('Index', () => {
 
         const result = user.selectors.findById('user-id');
         expect(result.result).to.deep.equal(findByIdResponse('user-id'));
-        expect(result.fetching).to.be.not.ok;
-        expect(result.fetched).to.be.ok;
+        expect(result.requesting).to.be.not.ok;
+        expect(result.requested).to.be.ok;
       })
 
       .then(() => user.findById('another-user-id'))
@@ -318,13 +318,13 @@ describe('Index', () => {
 
         const result1 = user.selectors.findById('another-user-id');
         expect(result1.result).to.deep.equal(findByIdResponse('another-user-id'));
-        expect(result1.fetching).to.be.not.ok;
-        expect(result1.fetched).to.be.ok;
+        expect(result1.requesting).to.be.not.ok;
+        expect(result1.requested).to.be.ok;
 
         const result2 = user.selectors.findById('user-id');
         expect(result2.result).to.deep.equal(findByIdResponse('user-id'));
-        expect(result2.fetching).to.be.not.ok;
-        expect(result2.fetched).to.be.ok;
+        expect(result2.requesting).to.be.not.ok;
+        expect(result2.requested).to.be.ok;
       })
       .then(() => done())
       .catch(done);

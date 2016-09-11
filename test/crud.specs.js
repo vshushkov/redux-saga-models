@@ -105,20 +105,20 @@ describe('CRUD mixin', () => {
     expect(findByIdResult.requesting).to.be.ok;
 
     const find1Result = model.selectors.find(query1);
-    expect(find1Result.records).to.deep.equal([]);
+    expect(find1Result.result).to.deep.equal([]);
     expect(find1Result.requesting).to.be.ok;
 
     const find2Result = model.selectors.find(query2);
-    expect(find2Result.records).to.deep.equal([]);
+    expect(find2Result.result).to.deep.equal([]);
     expect(find2Result.requesting).to.be.ok;
 
     const find3Result = model.selectors.find(query3);
-    expect(find3Result.records).to.deep.equal([]);
+    expect(find3Result.result).to.deep.equal([]);
     expect(find3Result.requesting).to.be.ok;
 
     const logoutResult = model.selectors.logout();
     expect(logoutResult.result).to.be.not.ok;
-    expect(logoutResult.fetching).to.be.ok;
+    expect(logoutResult.requesting).to.be.ok;
 
     Promise.resolve()
       .then(() => {
@@ -137,7 +137,7 @@ describe('CRUD mixin', () => {
         return model.find(query1)
           .then(() => {
             const findResult = model.selectors.find(query1);
-            expect(findResult.records.map(row => row.record)).to.deep.equal([users[1]]);
+            expect(findResult.result.map(row => row.record)).to.deep.equal([users[1]]);
             expect(findResult.requested).to.be.ok;
             expect(findResult.requesting).to.be.not.ok;
 
@@ -153,7 +153,7 @@ describe('CRUD mixin', () => {
         return model.find(query2)
           .then(() => {
             const findResult = model.selectors.find(query2);
-            expect(findResult.records.map(row => row.record)).to.deep.equal([users[2]]);
+            expect(findResult.result.map(row => row.record)).to.deep.equal([users[2]]);
             expect(findResult.requested).to.be.ok;
             expect(findResult.requesting).to.be.not.ok;
 
@@ -169,7 +169,7 @@ describe('CRUD mixin', () => {
         return model.find()
           .then(() => {
             const findResult = model.selectors.find();
-            expect(findResult.records.map(row => row.record)).to.deep.equal(users);
+            expect(findResult.result.map(row => row.record)).to.deep.equal(users);
             expect(findResult.requested).to.be.ok;
             expect(findResult.requesting).to.be.not.ok;
 
@@ -221,7 +221,7 @@ describe('CRUD mixin', () => {
             const findResult = model.selectors.find(query3);
             expect(findResult.params).to.deep.equal([query3]);
             expect(findResult.ids).to.deep.equal(['user5', 'user4', 'user3', 'user1']);
-            expect(findResult.records.map(row => row.record)).to.deep.equal(users);
+            expect(findResult.result.map(row => row.record)).to.deep.equal(users);
             expect(findResult.error).to.be.not.ok;
             expect(findResult.requesting).to.be.not.ok;
             expect(findResult.requested).to.be.ok;

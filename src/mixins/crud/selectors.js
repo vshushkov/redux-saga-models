@@ -12,21 +12,21 @@ export function _findById(modelSate, { id }) {
 
 export function _find(modelSate, params = {}) {
   if (!modelSate) {
-    return { requesting: true, records: [] };
+    return { requesting: true, result: [] };
   }
 
   const collections = modelSate.collections;
   const entry = collections.find(collection => isEqual(collection.params, params));
 
   if (!entry || isEmpty(modelSate.byId)) {
-    return { requesting: true, records: [] };
+    return { requesting: true, result: [] };
   }
 
-  const records = entry.ids
+  const result = entry.ids
     .map(id => modelSate.byId[id])
     .filter(record => record);
 
-  return { ... entry, records };
+  return { ... entry, result };
 }
 
 export default function createSelectors(model) {

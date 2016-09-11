@@ -17,7 +17,7 @@ function createMethodReducer(model, method) {
     return (state, action) => action;
   }
 
-  const initialResultState = { params: null, result: null, fetching: false, fetched: false, error: null };
+  const initialResultState = { params: null, result: null, requesting: false, requested: false, error: null };
   const initialState = [];
   const [TYPE, SUCCESS, ERROR] = methodNameToTypes(model.config().name, method.name || method);
 
@@ -28,14 +28,14 @@ function createMethodReducer(model, method) {
 
     const error = action.type === ERROR ? action.payload : null;
     const params = action.meta && action.meta.params ? action.meta.params || null : null;
-    const fetching = action.type === TYPE;
-    const fetched = action.type !== TYPE;
+    const requesting = action.type === TYPE;
+    const requested = action.type !== TYPE;
     const index = state.findIndex(row => isEqual(row.params, params));
 
     if (index === -1) {
       return [
         ...state,
-        { ...initialResultState, params, error, fetching, fetched }
+        { ...initialResultState, params, error, requesting, requested }
       ]
     }
 
@@ -45,7 +45,7 @@ function createMethodReducer(model, method) {
 
     return [
       ...state.slice(0, index),
-      { ...state[index], result, error, fetching, fetched: true },
+      { ...state[index], result, error, requesting, requested: true },
       ...state.slice(index + 1, state.length)
     ];
   };
