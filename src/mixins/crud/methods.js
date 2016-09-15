@@ -28,10 +28,6 @@ const createModelMethods = (model, fetch) => {
     }
   };
 
-  methods[updateById].response = {
-    after: methods[findById]
-  };
-
   return api({ fetch, basePath, methods });
 };
 
