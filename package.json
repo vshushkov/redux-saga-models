@@ -14,7 +14,8 @@
     "clean": "rimraf mixins helpers *.js",
     "build": "npm run clean && babel src --out-dir . --ignore *.specs.js",
     "test": "mocha --compilers js:babel-register test/*.js --require babel-polyfill",
-    "prepublish": "npm test && npm run build"
+    "prepublish": "npm test && npm run build",
+    "postpublish": "npm run clean"
   },
   "repository": {
     "type": "git",
